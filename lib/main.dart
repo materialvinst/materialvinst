@@ -31,8 +31,80 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Material till salu'),
     );
+  }
+}
+
+class MaterialList extends StatelessWidget {
+  final List<Widget> children;
+  final EdgeInsetsGeometry padding;
+  final ListView view;
+  MaterialList({
+    super.key,
+    required this.children,
+    this.padding = const EdgeInsets.all(8),
+  }) : view = ListView(
+          padding: padding,
+          children: children,
+        ); // <- initializer list
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(child: view);
+  }
+}
+
+class MaterialCard extends Container {
+  final String name;
+  final String date;
+  final String place;
+  final String seller;
+
+  @override
+  Widget get child {
+    return getTextRows();
+  }
+
+  MaterialCard({
+    required this.name,
+    required this.date,
+    required this.place,
+    required this.seller,
+    double height = 150,
+    width = double.infinity,
+    margin = const EdgeInsets.all(8),
+    padding = const EdgeInsets.all(12),
+    color = Colors.lightBlue,
+  }) : super(
+          height: height,
+          width: width,
+          margin: margin,
+          padding: padding,
+          color: color,
+        );
+
+  Text getTitle([double size = 25]) {
+    return Text(name, style: TextStyle(fontSize: size));
+  }
+
+  Row getInfoRow(IconData icon, String info, [double size = 18]) {
+    return Row(children: [
+      Icon(icon, size: size),
+      Text(" $info", style: TextStyle(fontSize: size)),
+    ]);
+  }
+
+  Column getTextRows() {
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          getTitle(),
+          getInfoRow(Icons.schedule, date),
+          getInfoRow(Icons.location_on, place),
+          getInfoRow(Icons.domain, seller),
+        ]);
   }
 }
 
@@ -59,7 +131,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _incrementCounter() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
+      // This call to setState gtells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
@@ -87,26 +159,42 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+            MaterialList(children: [
+              MaterialCard(
+                  name: "Material",
+                  date: "5 dagar sen",
+                  place: "Knislinge",
+                  seller: "PEAB"),
+              MaterialCard(
+                  name: "Material",
+                  date: "5 dagar sen",
+                  place: "Knislinge",
+                  seller: "PEAB"),
+              MaterialCard(
+                  name: "Material",
+                  date: "5 dagar sen",
+                  place: "Knislinge",
+                  seller: "PEAB"),
+              MaterialCard(
+                  name: "Material",
+                  date: "5 dagar sen",
+                  place: "Knislinge",
+                  seller: "PEAB"),
+            ]),
+            Padding(
+                padding: EdgeInsets.all(20),
+                child: SearchBar(
+                  hintText: "Sök på material...",
+                )),
+            NavigationBar(
+              destinations: [
+                const Icon(Icons.home),
+                const Icon(Icons.volunteer_activism),
+                const Icon(Icons.settings),
+              ],
             ),
             Text(
               '$_counter',
@@ -118,7 +206,7 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.info),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
