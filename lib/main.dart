@@ -1,7 +1,56 @@
 import 'package:flutter/material.dart';
+import 'models/sellobj.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert'; // For jsonDecode
 
 void main() {
   runApp(const MyApp());
+}
+
+Future<List<SellObj>> fetchSellObjs() async {
+  final response = await http.get(Uri.parse('http://localhost:8080/materials'));
+
+  if (response.statusCode == 200) {
+    List<dynamic> body = jsonDecode(response.body);
+    return body.map((dynamic item) => SellObj.fromJson(item)).toList();
+  } else {
+    throw Exception('Failed to load sell objs');
+  }
+}
+
+class SellObjsScreen extends StatefulWidget {
+  @override
+  _SellObjsScreenState createState() => _SellObjsScreenState();
+}
+
+class _SellObjsScreenState extends State<SellObjsScreen> {
+  late Future<List<SellObj>> futureSellObjs;
+
+  @override
+  void initState() {
+    super.initState();
+    futureSellObjs = fetchSellObjs();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<SellObj>>(
+      future: futureSellObjs,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text('No persons found'));
+        } else {
+          List<SellObj> sellobjs = snapshot.data!;
+          return MaterialList(
+              children: sellobjs.map((e) => MaterialCard(sellObj: e)).toList());
+        }
+      },
+    );
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -56,10 +105,7 @@ class MaterialList extends StatelessWidget {
 }
 
 class MaterialCard extends Container {
-  final String name;
-  final String date;
-  final String place;
-  final String seller;
+  final SellObj sellObj;
 
   @override
   Widget get child {
@@ -67,10 +113,7 @@ class MaterialCard extends Container {
   }
 
   MaterialCard({
-    required this.name,
-    required this.date,
-    required this.place,
-    required this.seller,
+    required this.sellObj,
     double height = 150,
     width = double.infinity,
     margin = const EdgeInsets.all(8),
@@ -85,7 +128,7 @@ class MaterialCard extends Container {
         );
 
   Text getTitle([double size = 25]) {
-    return Text(name, style: TextStyle(fontSize: size));
+    return Text(sellObj.name, style: TextStyle(fontSize: size));
   }
 
   Row getInfoRow(IconData icon, String info, [double size = 18]) {
@@ -101,9 +144,9 @@ class MaterialCard extends Container {
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           getTitle(),
-          getInfoRow(Icons.schedule, date),
-          getInfoRow(Icons.location_on, place),
-          getInfoRow(Icons.domain, seller),
+          getInfoRow(Icons.schedule, sellObj.date),
+          getInfoRow(Icons.location_on, sellObj.place),
+          getInfoRow(Icons.domain, sellObj.seller),
         ]);
   }
 }
@@ -162,28 +205,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            MaterialList(children: [
-              MaterialCard(
-                  name: "Material",
-                  date: "5 dagar sen",
-                  place: "Knislinge",
-                  seller: "PEAB"),
-              MaterialCard(
-                  name: "Material",
-                  date: "5 dagar sen",
-                  place: "Knislinge",
-                  seller: "PEAB"),
-              MaterialCard(
-                  name: "Material",
-                  date: "5 dagar sen",
-                  place: "Knislinge",
-                  seller: "PEAB"),
-              MaterialCard(
-                  name: "Material",
-                  date: "5 dagar sen",
-                  place: "Knislinge",
-                  seller: "PEAB"),
-            ]),
+            SellObjsScreen(),
             Padding(
                 padding: EdgeInsets.all(20),
                 child: SearchBar(
