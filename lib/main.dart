@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'models/sellobj.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // For jsonDecode
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   runApp(const MyApp());
@@ -80,6 +81,15 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [
+        Locale('en'), // English
+        Locale('sv'), // Spanish
+      ],
       home: const MyHomePage(title: 'Material till salu'),
     );
   }
