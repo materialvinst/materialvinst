@@ -78,7 +78,10 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.amber,
+        ),
+        // colorScheme: ColorScheme.fromSeed(seedColor: Colors.yellow),
         useMaterial3: true,
       ),
       localizationsDelegates: [
@@ -114,28 +117,35 @@ class MaterialList extends StatelessWidget {
   }
 }
 
-class MaterialCard extends Container {
+class MaterialCard extends StatelessWidget {
   final SellObj sellObj;
-
-  @override
-  Widget get child {
-    return getTextRows();
-  }
+  final double height;
+  final double width;
+  dynamic margin;
+  dynamic padding;
 
   MaterialCard({
     required this.sellObj,
-    double height = 150,
-    width = double.infinity,
-    margin = const EdgeInsets.all(8),
-    padding = const EdgeInsets.all(12),
-    color = Colors.lightBlue,
-  }) : super(
-          height: height,
-          width: width,
-          margin: margin,
-          padding: padding,
-          color: color,
-        );
+    this.height = 300,
+    this.width = double.infinity,
+    this.margin = const EdgeInsets.all(8),
+    this.padding = const EdgeInsets.all(12),
+  });
+
+  Widget build(BuildContext context) {
+    return Container(
+      height: height,
+      width: width,
+      margin: margin,
+      padding: padding,
+      color: Theme.of(context).colorScheme.inversePrimary,
+      child: getTextRows(),
+    ).build(context);
+  }
+
+  Widget get child {
+    return getTextRows();
+  }
 
   Text getTitle([double size = 25]) {
     return Text(sellObj.name, style: TextStyle(fontSize: size));
@@ -149,10 +159,18 @@ class MaterialCard extends Container {
   }
 
   Column getTextRows() {
+    var url = "http://localhost:8080/materialpic/${sellObj.id}";
+    print(url);
     return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
+          Image.network(
+            url,
+            width: double.infinity,
+            height: 150,
+            fit: BoxFit.fitWidth,
+          ),
           getTitle(),
           getInfoRow(Icons.schedule, sellObj.date),
           getInfoRow(Icons.location_on, sellObj.place),
