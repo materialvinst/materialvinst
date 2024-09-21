@@ -220,12 +220,22 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            SellObjsScreen(),
-            Padding(
-                padding: EdgeInsets.all(20),
-                child: SearchBar(
-                  hintText: "Sök på material...",
-                )),
+            Expanded(
+                child: Stack(children: [
+              SellObjsScreen(),
+              Positioned(
+                  bottom: 20,
+                  right: 40,
+                  left: 40,
+                  child: SearchBar(
+                    hintText: "Sök på material...",
+                    // backgroundColor: WidgetStateProperty.all<Color>(
+                    //     Theme.of(context).colorScheme.surfaceContainerHigh),
+                    // backgroundColor:
+                    // WidgetStateProperty.all<Color>(Colors.white),
+                    // shadowColor: WidgetStateProperty.all<Color>(Colors.white38),
+                  )),
+            ])),
             NavigationBar(
               destinations: [
                 const Icon(Icons.home),
