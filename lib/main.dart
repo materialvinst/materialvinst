@@ -126,7 +126,7 @@ class MaterialCard extends StatelessWidget {
 
   MaterialCard({
     required this.sellObj,
-    this.height = 300,
+    this.height = 310,
     this.width = double.infinity,
     this.margin = const EdgeInsets.all(8),
     this.padding = const EdgeInsets.all(12),
@@ -165,12 +165,14 @@ class MaterialCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          Image.network(
-            url,
-            width: double.infinity,
-            height: 150,
-            fit: BoxFit.fitWidth,
-          ),
+          Padding(
+              padding: EdgeInsets.only(top: 5, bottom: 10),
+              child: Image.network(
+                url,
+                width: double.infinity,
+                height: 150,
+                fit: BoxFit.fitWidth,
+              )),
           getTitle(),
           getInfoRow(Icons.schedule, sellObj.date),
           getInfoRow(Icons.location_on, sellObj.place),
