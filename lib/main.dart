@@ -26,6 +26,10 @@ class SellObjsScreen extends StatefulWidget {
 
 class _SellObjsScreenState extends State<SellObjsScreen> {
   late Future<List<SellObj>> futureSellObjs;
+  List<SellObj> filteredSellObjs = [];
+
+  // Variable to hold search query
+  String query = "";
 
   @override
   void initState() {
@@ -33,24 +37,73 @@ class _SellObjsScreenState extends State<SellObjsScreen> {
     futureSellObjs = fetchSellObjs();
   }
 
+  // This method will filter the list based on the search query
+  void _filterItems(String enteredKeyword, List<SellObj> sellObjs) {
+    List<SellObj> results = [];
+    if (enteredKeyword.isEmpty) {
+      // If search query is empty, display all items
+      results = sellObjs;
+    } else {
+      // Filter the list based on the entered keyword
+      results = sellObjs
+          .where((sellObj) =>
+              sellObj.name.toLowerCase().contains(enteredKeyword.toLowerCase()))
+          .toList();
+    }
+
+    // Update the filtered list
+    setState(() {
+      filteredSellObjs = results;
+      query = enteredKeyword;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<SellObj>>(
-      future: futureSellObjs,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text('No persons found'));
-        } else {
-          List<SellObj> sellobjs = snapshot.data!;
-          return MaterialList(
-              children: sellobjs.map((e) => MaterialCard(sellObj: e)).toList());
-        }
-      },
-    );
+    return Expanded(
+        child: Stack(children: [
+      (FutureBuilder<List<SellObj>>(
+        future: futureSellObjs,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('No persons found'));
+          } else {
+            List<SellObj> sellobjs = snapshot.data!;
+            // Initially, display all items
+            if (query.isEmpty) {
+              filteredSellObjs = sellobjs;
+            }
+            return ListView.builder(
+              itemCount: filteredSellObjs.length,
+              itemBuilder: (context, index) {
+                return MaterialCard(sellObj: filteredSellObjs[index]);
+              },
+            );
+          }
+        },
+      )),
+      Positioned(
+          bottom: 20,
+          right: 40,
+          left: 40,
+          child: SearchBar(
+            hintText: "Sök på material...",
+            onChanged: (value) {
+              futureSellObjs.then((items) {
+                _filterItems(value, items);
+              });
+            },
+            // backgroundColor: WidgetStateProperty.all<Color>(
+            //     Theme.of(context).colorScheme.surfaceContainerHigh),
+            // backgroundColor:
+            // WidgetStateProperty.all<Color>(Colors.white),
+            // shadowColor: WidgetStateProperty.all<Color>(Colors.white38),
+          )),
+    ]));
   }
 }
 
@@ -222,23 +275,9 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Expanded(
-                child: Stack(children: [
-              SellObjsScreen(),
-              Positioned(
-                  bottom: 20,
-                  right: 40,
-                  left: 40,
-                  child: SearchBar(
-                    hintText: "Sök på material...",
-                    // backgroundColor: WidgetStateProperty.all<Color>(
-                    //     Theme.of(context).colorScheme.surfaceContainerHigh),
-                    // backgroundColor:
-                    // WidgetStateProperty.all<Color>(Colors.white),
-                    // shadowColor: WidgetStateProperty.all<Color>(Colors.white38),
-                  )),
-            ])),
+            SellObjsScreen(),
             NavigationBar(
+              height: 50,
               destinations: [
                 const Icon(Icons.home),
                 const Icon(Icons.volunteer_activism),
