@@ -1,4 +1,6 @@
 { lib
+, glib
+, wrapGAppsHook
 , mkShell
 , androidsdk
 , jdk17
@@ -27,6 +29,10 @@
     qemu_kvm
     gradle
     jdk17
+  ];
+
+  nativeBuildInputs = [
+    wrapGAppsHook
   ];
 
   buildInputs = [
@@ -62,8 +68,9 @@
   JAVA_HOME = jdk17.home;
   FLUTTER_ROOT = flutter;
   DART_ROOT = "${flutter}/bin/cache/dart-sdk";
-  GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${androidsdk}/libexec/android-sdk/build-tools/33.0.2/aapt2";
+  GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${androidsdk}/libexec/android-sdk/build-tools/34.0.0/aapt2";
   QT_QPA_PLATFORM = "wayland;xcb"; # emulator related: try using wayland, otherwise fall back to X.
   # NB: due to the emulator's bundled qt version, it currently does not start with QT_QPA_PLATFORM="wayland".
   # Maybe one day this will be supported.
+  GSETTINGS_SCHEMA_DIR = glib.getSchemaPath gtk3;
 } 
